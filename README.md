@@ -6,10 +6,13 @@ Usage: Customizable script that reads Outlook email using the Outlook ComObject 
 Much more to come!
 
 Requirements:
+
 +SaveEmailCuckoo.ps1
+
 +curl.exe
 
 Setup
+
 +Create a PowerCuckoo directory and store PowerCuckoo.ps1, SaveEmailCuckoo.ps1, and curl.exe in that direcory.
 
 Note: Not fully functioning.
