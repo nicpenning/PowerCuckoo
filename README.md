@@ -7,15 +7,15 @@ Much more to come!
 
 Requirements:
 
-+SaveEmailCuckoo.ps1
+ - SaveEmailCuckoo.ps1
 
-+curl.exe
+ - curl.exe
 
 Setup
 
-+Create a PowerCuckoo directory and store PowerCuckoo.ps1, SaveEmailCuckoo.ps1, and curl.exe in that direcory.
+ - Create a PowerCuckoo directory and store PowerCuckoo.ps1, SaveEmailCuckoo.ps1, and curl.exe in that direcory.
 
 Note: Not fully functioning.
 
 What works:
-+Reading a specific email folder to look for URLs or Attachments
+ - Reading a specific email folder to look for URLs or Attachments
