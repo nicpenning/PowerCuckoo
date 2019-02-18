@@ -10,14 +10,13 @@ Requirements:
  - Windows 7+
  - Outlook 2010+
  - PowerShell
- - SaveEmailCuckoo.ps1
- - curl.exe
+ - Cuckoo 2.0+
 
 Setup
+ - Download PowerCuckoo.ps1
+ - Run ./PowerCuckoo.ps1
 
- - Create a PowerCuckoo directory and store PowerCuckoo.ps1, SaveEmailCuckoo.ps1, and curl.exe in that direcory.
-
-Note: Not fully functioning.
+Note: Should work! Try it out!
 
 What works:
  - Reading a specific email folder to look for URLs or Attachments
@@ -28,6 +27,5 @@ Usage:
  TODO:
   - Update this README
   - Add screenshots of POC
-  - Remove Curl.exe requirement
-  - Remove SaveEmailCuckoo.ps1 requirement
+  - Submit Files
   - Add Auto-setup/install
