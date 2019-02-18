@@ -44,13 +44,13 @@ $Outlook = New-Object -ComObject Outlook.Application
 $namespace = $Outlook.GetNameSpace("MAPI")
 #Ask for Email Address for Outlook
 $title = 'Email Address Configuration'
-$msg = "Enter your Outlook Email Address`n`nTip: Make sure Outlook is Running!"
+$msg = "Please Enter your Outlook Email Address`n`nExample: email@address.com`n`nTip: Make sure Outlook is Running!"
 $emailAddress = [Microsoft.VisualBasic.Interaction]::InputBox($msg, $title)
 
 #Ask for which folder to search
 $title = 'Email Folder Configuration'
 $foldersAvailable = $namespace.Folders.Item($emailAddress).Folders | Select-Object Name
-$msg = "Enter your Outlook Email Folder you wish to parse: $foldersAvailable"
+$msg = "Please Enter your Outlook Email Folder you wish to parse: $foldersAvailable"
 #Ask for folder input - also can be used to statically select folder name (see $foldername below)
 #All the GUI form data stuff\/ \/ \/
 $form = New-Object System.Windows.Forms.Form; $form.Text = 'Select a folder'
