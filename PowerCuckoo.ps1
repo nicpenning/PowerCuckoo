@@ -38,12 +38,9 @@ catch {
 
 #Cuckoo REST API
 $CuckooREST = $CuckooIPandPort+"/"
-#$MaliciousFileREST = $CuckooREST + 'tasks/create/file'
+$MaliciousFileREST = $CuckooREST + 'tasks/create/file'
 $MaliciousURLREST = $CuckooREST + 'tasks/create/url'
 #$MaliciousArchiveREST = $CuckooREST + 'tasks/create/submit'
- 
-#Malzoo API Calls
-#curl -X POST -F file=@/path/to/sample -F tag=yourtaghere http://localhost:1338/file/add
 
 #Parse Email Message - Ready Outlook
 Add-Type -Assembly "Microsoft.Office.Interop.Outlook"
@@ -109,39 +106,21 @@ if ($result -eq [System.Windows.Forms.DialogResult]::OK){
 $folderName = $folderChoosen
 #RegEx to Grab URL
 #$RegExHtmlLinks = '<a\s+(?:[^>]*?\s+)?href="([h+f][^"]*)"'
-#$RegExHostName = '^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$'
 $RegExSpecial = '((http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-;]*[\w@?^=%&/~+#-;])?)'
 #Cuckoo Folder - #Feed the Cuckoo Subfolder
 $FeedTheCuckooUnread = $namespace.Folders.Item($emailAddress).Folders.Item($folderName).Items | Where-Object UnRead -EQ true
 $unreadCount = $FeedTheCuckooUnread.Count
+if(!$unreadCount){$unreadCount = $FeedTheCuckooUnread.UnRead.Count}
 Write-Host -ForegroundColor Green "Found $unreadCount Unread Items to parse"
-
-#Save Email as .MSG file
-<#function saveEmail{
-    #The following command will save only the unread emails in the Inbox to the C:\Saved Emails\ folder
-    $emailDestinationPath = 'C:\Saved Emails\Inbox'
-    #$outbox = 'C:\Saved Emails\Outbox'
-    .\Save-EmailCuckoo.ps1 -DestinationPath $emailDestinationPath -UnreadOnly #-MarkRead
-    $emailMessage = Get-ChildItem $emailDestinationPath
-    $emailPath = $emailDestinationPath+'\'+$emailMessage.Name
- 
-    #Submit for Analysis
-    maliciousFileSubmission($emailPath)
-}#>
 
 #Parse Email for URLs
 function findURLs {
     $EmailBodyToSearch = @()
     $urlsFound = @()
-   
-    #Mark Message(s) as Read 
-    $FeedTheCuckooUnread | ForEach-Object {
-        $_.Unread = "False"
-    }
 
     #Store URLs to get Searched from Email HTMLBody
     $EmailBodyToSearch += $FeedTheCuckooUnread.HTMLBody
-    #$testURLFind = $EmailBodyToSearch | Select-String -AllMatches $RegExSpecial
+
     #Loop through results for URLs
     $EmailBodyToSearch | ForEach-Object {
     if ($_ -match $RegExSpecial)
@@ -159,7 +138,6 @@ function findURLs {
     #Clean URLs for Analysis
 
     if(!([string]::IsNullOrEmpty($urlsFound))){
-        #Write-Host 'URL Found! Going to Submit:' $cleanedUrlsForAnalysis.Count'URLs to Cuckoo!!'
         [System.Windows.MessageBox]::Show('URL(s) Found! Going to Submit: ' + $uniqueTotalURLs + ' URLs to Cuckoo!!')
         $msgBoxInput =  [System.Windows.MessageBox]::Show('Would you like to see the URLs?','Urls Found','YesNo','Warning')
 
@@ -188,16 +166,47 @@ function findURLs {
 }
  
 #Send Cuckoo a malicious File
-<#function maliciousFileSubmission ($submitFile) {
-    [System.Windows.MessageBox]::Show('Running Malicious File Submission')
-    #$analysis = .\curl.exe -F file=@$submitFile $MaliciousFileREST
-    $analysis = $analysis -replace '{'
-    $analysis = $analysis -replace '}'
-    $analysis = $analysis -replace ' '
-    $analysis = $analysis -replace '"'
-   [System.Windows.MessageBox]::Show('File analysis submitted: '+ $emailMessage.Name + ' with '+ $analysis)
-    #move $emailPath $outbox
-}#>
+function maliciousFileSubmission ($submitFile) {
+    $FilePath = Get-Location
+    $FeedTheCuckooUnread | ForEach-Object{
+        $messageSubject = $_.Subject
+        Write-Host $messageSubject
+        #Store each attachment then upload
+        $_.Attachments | ForEach-Object {
+            Write-Host "Attachment found: "$_.FileName -ForegroundColor Green
+            $fileNameToStore = $_.FileName
+            $tempFileStorage = (Join-Path $FilePath $fileNameToStore)
+            $_.SaveAsFile($tempFileStorage)
+            Write-Host "Attachment stored in: $tempFileStorage" -ForegroundColor Blue
+
+            #Upload the file via REST API
+            $fileBytes = [System.IO.File]::ReadAllBytes($tempFileStorage)
+            $fileEnc = [System.Text.Encoding]::GetEncoding('UTF-8').GetString($fileBytes)
+            $boundary = [System.Guid]::NewGuid().ToString()
+            $LF = "`r`n";
+
+            $bodyLines = ( 
+                "--$boundary",
+                "Content-Disposition: form-data; name=`"file`"; filename=`"$fileNameToStore`"",
+                "Content-Type: application/octet-stream$LF",
+                $fileEnc,
+                "--$boundary--$LF" 
+            ) -join $LF
+            $task = ''
+            #Send the encoded blob to Cuckoo!
+            $task = Invoke-RestMethod -Uri $MaliciousFileREST -Method Post -ContentType "multipart/form-data; boundary=`"$boundary`"" -Body $bodyLines
+            [System.Windows.MessageBox]::Show('Running Malicious File Submission')
+            #If task submits successfully, delete the temporary created file.
+            if($task){
+                Write-Host -ForegroundColor Red "Deleting temporary file download...$fileNameToStore"
+                Remove-Item $fileNameToStore
+                [System.Windows.MessageBox]::Show("File analysis submitted for the Email Subject:`n"+$FeedTheCuckooUnread.Subject+"`n`n The TaskID is: "+$task.task_id)
+            }else{
+                Write-Host -ForegroundColor Yellow "There was an issue trying to submit a file to Cuckoo, it was not removed."
+            }
+        }
+    }
+}
  
 #Function for sending Cuckoo malicious URLs
 function maliciousURLSubmission ($submitURL) {
@@ -217,24 +226,21 @@ function maliciousURLSubmission ($submitURL) {
  
 #Check for Attachments / URLs
 $attachmentCount = $FeedTheCuckooUnread.Attachments.Count
-
-if ($FeedTheCuckooUnread.Attachments.Count -ge 1) {
+#Mark Message(s) as Read 
+$FeedTheCuckooUnread | ForEach-Object {
+    $_.Unread = "False"
+}
+if ($attachmentCount -ge 1) {
     Write-Host "Attachments Found: $attachmentCount (Not currently supported to send for analysis)"
-    Write-Host "Will look for URLs now."
+    maliciousFileSubmission
+    Write-Host "Onto looking for URLs"
     findURLs
-}elseif($FeedTheCuckooUnread.Attachments.Count -eq 0){
+}elseif($attachmentCount -eq 0){
    [System.Windows.MessageBox]::Show('No attachments, finding URLs for analysis')
     #Find URL in Email
     findURLs
 }else{
     [System.Windows.MessageBox]::Show('Something went terribly wrong')
 }
- 
-<#
-Other Tests and Useful Commands
-#$namespace.Folders.Item(2).Folders.Item(1).Folders.Item(1).Items | Where-Object UnRead -EQ True
-# | Format-List Unread, CreationTime, SenderName, ConversationTopic, Body, HTMLBody, To
-#Sample Data
-#$MaliciousSite = "http://google.com"
-#$MaliciousFile = ".\Alert.msg"
-#>
+
+Write-Host "PowerCuckoo has finished running!" -ForegroundColor Blue
