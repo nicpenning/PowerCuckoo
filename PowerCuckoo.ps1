@@ -1,14 +1,19 @@
 <#PowerCuckoo
     Created by Nicholas Penning
     Date: 8/14/2017
-    Updated: 9/13/2017
+    Updated: 2/18/2019
     Description: For automation!
 
     Note: Works well grabbing a folder from an email. Try it out!
 #>
  
-#Cuckoo REST Calls
-$CuckooREST = 'http://localhost:8090'
+#Cuckoo config
+#127.0.0.1:8090 is default, to change use: cuckoo api --host 127.0.0.1 -p 80
+$CuckooIP = '192.168.0.25'
+$CuckooPort = '8090'
+
+#Cuckoo REST API
+$CuckooREST = "http://"+$CuckooIP+":"+$CuckooPort+"/"
 $MaliciousFileREST = $CuckooREST + 'tasks/create/file'
 $MaliciousURLREST = $CuckooREST + 'tasks/create/url'
 $MaliciousArchiveREST = $CuckooREST + 'tasks/create/submit'
