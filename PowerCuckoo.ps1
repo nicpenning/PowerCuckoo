@@ -20,12 +20,8 @@ Currently works well for grabbing Unread messages from a folder of your choosing
 Try it out!
 #>
 #Some things to load first - Pay no attention here
-[void][Reflection.Assembly]::LoadWithPartialName('Microsoft.VisualBasic')
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
-Add-Type -AssemblyName PresentationFramework
-#Cuckoo config
-#127.0.0.1:8090 is default, to change use: cuckoo api --host 127.0.0.1 -p 80
+[void][Reflection.Assembly]::LoadWithPartialName('Microsoft.VisualBasic'); Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing; Add-Type -AssemblyName PresentationFramework
+#Cuckoo Config# 127.0.0.1:8090 is default, to change use: cuckoo api --host 127.0.0.1 -p 80
 try {
     $CuckooIPandPort = [Microsoft.VisualBasic.Interaction]::InputBox("Set your Cuckoo Host and Port`n`n`nFor Example: http://127.0.0.1:8090", "Where is your Cuckoo nesting?")
     $cuckooStatus = Invoke-RestMethod $CuckooIPandPort"/cuckoo/status"
@@ -55,47 +51,29 @@ $emailAddress = [Microsoft.VisualBasic.Interaction]::InputBox($msg, $title)
 $title = 'Email Folder Configuration'
 $foldersAvailable = $namespace.Folders.Item($emailAddress).Folders | Select-Object Name
 $msg = "Enter your Outlook Email Folder you wish to parse: $foldersAvailable"
-#Manually ask for folder input - also can be used to statically select folder name
-#$folderName = [Microsoft.VisualBasic.Interaction]::InputBox($msg, $title)
+#Ask for folder input - also can be used to statically select folder name (see $foldername below)
+#All the GUI form data stuff\/ \/ \/
+$form = New-Object System.Windows.Forms.Form; $form.Text = 'Select a folder'
+$form.Size = New-Object System.Drawing.Size(300,200); $form.StartPosition = 'CenterScreen'
+$OKButton = New-Object System.Windows.Forms.Button; $OKButton.Location = New-Object System.Drawing.Point(75,120)
+$OKButton.Size = New-Object System.Drawing.Size(75,23); $OKButton.Text = 'OK'
+$OKButton.DialogResult = [System.Windows.Forms.DialogResult]::OK; $form.AcceptButton = $OKButton; $form.Controls.Add($OKButton)
 
-$form = New-Object System.Windows.Forms.Form
-$form.Text = 'Select a folder'
-$form.Size = New-Object System.Drawing.Size(300,200)
-$form.StartPosition = 'CenterScreen'
-$OKButton = New-Object System.Windows.Forms.Button
-$OKButton.Location = New-Object System.Drawing.Point(75,120)
-$OKButton.Size = New-Object System.Drawing.Size(75,23)
-$OKButton.Text = 'OK'
-$OKButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
-$form.AcceptButton = $OKButton
-$form.Controls.Add($OKButton)
+$CancelButton = New-Object System.Windows.Forms.Button; $CancelButton.Location = New-Object System.Drawing.Point(150,120)
+$CancelButton.Size = New-Object System.Drawing.Size(75,23); $CancelButton.Text = 'Cancel'
+$CancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel; $form.CancelButton = $CancelButton; $form.Controls.Add($CancelButton)
 
-$CancelButton = New-Object System.Windows.Forms.Button
-$CancelButton.Location = New-Object System.Drawing.Point(150,120)
-$CancelButton.Size = New-Object System.Drawing.Size(75,23)
-$CancelButton.Text = 'Cancel'
-$CancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
-$form.CancelButton = $CancelButton
-$form.Controls.Add($CancelButton)
+$label = New-Object System.Windows.Forms.Label; $label.Location = New-Object System.Drawing.Point(10,20)
+$label.Size = New-Object System.Drawing.Size(280,20); $label.Text = 'Please select a folder:'; $form.Controls.Add($label)
 
-$label = New-Object System.Windows.Forms.Label
-$label.Location = New-Object System.Drawing.Point(10,20)
-$label.Size = New-Object System.Drawing.Size(280,20)
-$label.Text = 'Please select a folder:'
-$form.Controls.Add($label)
-
-$listBox = New-Object System.Windows.Forms.ListBox
-$listBox.Location = New-Object System.Drawing.Point(10,40)
-$listBox.Size = New-Object System.Drawing.Size(260,20)
-$listBox.Height = 80
+$listBox = New-Object System.Windows.Forms.ListBox; $listBox.Location = New-Object System.Drawing.Point(10,40); 
+$listBox.Size = New-Object System.Drawing.Size(260,20); $listBox.Height = 80
 
 $foldersAvailable.Name | ForEach-Object {
     [void] $listBox.Items.Add("$_")
 }
 
-$form.Controls.Add($listBox)
-$form.Topmost = $true
-$result = $form.ShowDialog()
+$form.Controls.Add($listBox); $form.Topmost = $true; $result = $form.ShowDialog()
 
 if ($result -eq [System.Windows.Forms.DialogResult]::OK){
         $folderChoosen = $listBox.SelectedItem
@@ -103,9 +81,10 @@ if ($result -eq [System.Windows.Forms.DialogResult]::OK){
 }else{
         Write-Host "No folder choosen!" -ForegroundColor Red
 }
+#All the GUI form data stuff/\ /\ /\
+
 $folderName = $folderChoosen
 #RegEx to Grab URL
-#$RegExHtmlLinks = '<a\s+(?:[^>]*?\s+)?href="([h+f][^"]*)"'
 $RegExSpecial = '((http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-;]*[\w@?^=%&/~+#-;])?)'
 #Cuckoo Folder - #Feed the Cuckoo Subfolder
 $FeedTheCuckooUnread = $namespace.Folders.Item($emailAddress).Folders.Item($folderName).Items | Where-Object UnRead -EQ true
@@ -223,7 +202,7 @@ function maliciousURLSubmission ($submitURL) {
     [System.Windows.MessageBox]::Show("All URLs ($uniqueTotalURLs) have been sent to Cuckoo!")
 
 }
- 
+
 #Check for Attachments / URLs
 $attachmentCount = $FeedTheCuckooUnread.Attachments.Count
 #Mark Message(s) as Read 
@@ -233,7 +212,7 @@ $FeedTheCuckooUnread | ForEach-Object {
 if ($attachmentCount -ge 1) {
     Write-Host "Attachments Found: $attachmentCount"
     maliciousFileSubmission
-    Write-Host "Onto looking for URLs"
+    Write-Host "On to looking for URLs"
     findURLs
 }elseif($attachmentCount -eq 0){
    [System.Windows.MessageBox]::Show('No attachments, finding URLs for analysis')
