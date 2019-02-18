@@ -114,7 +114,6 @@ function findURLs {
     $uniqueTotalURLs = $urlsFound.Count
     $totalDiffURLs = $totalURLs-$uniqueTotalURLs
     Write-Host "Down to $uniqueTotalURLs found. Removed $totalDiffURLs duplicate(s)."
-    #Clean URLs for Analysis
 
     if(!([string]::IsNullOrEmpty($urlsFound))){
         [System.Windows.MessageBox]::Show('URL(s) Found! Going to Submit: ' + $uniqueTotalURLs + ' URLs to Cuckoo!!')
@@ -222,4 +221,4 @@ if ($attachmentCount -ge 1) {
     [System.Windows.MessageBox]::Show('Something went terribly wrong')
 }
 
-Read-host "PowerCuckoo has finished running! Hit any key to exit"
+Read-host "PowerCuckoo has finished running! Hit any key to exit."
