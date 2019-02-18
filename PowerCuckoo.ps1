@@ -196,7 +196,7 @@ function maliciousURLSubmission ($submitURL) {
         $submitURLx = $_
         $task = Invoke-RestMethod -Method Post -Uri $MaliciousURLREST -Body url=$submitURLx
         $taskID = $task.task_id
-        [System.Windows.MessageBox]::Show("Task ID: $taskID"+"`nURL Submitted: $submitURLx")
+        Write-Host "Task ID: $taskID `nURL Submitted: $submitURLx"
     }
 
     [System.Windows.MessageBox]::Show("All URLs ($uniqueTotalURLs) have been sent to Cuckoo!")
@@ -222,4 +222,4 @@ if ($attachmentCount -ge 1) {
     [System.Windows.MessageBox]::Show('Something went terribly wrong')
 }
 
-Write-Host "PowerCuckoo has finished running!" -ForegroundColor Blue
+Read-host "PowerCuckoo has finished running! Hit any key to exit"
