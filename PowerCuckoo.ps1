@@ -14,9 +14,9 @@ $CuckooPort = '8090'
 
 #Cuckoo REST API
 $CuckooREST = "http://"+$CuckooIP+":"+$CuckooPort+"/"
-$MaliciousFileREST = $CuckooREST + 'tasks/create/file'
+#$MaliciousFileREST = $CuckooREST + 'tasks/create/file'
 $MaliciousURLREST = $CuckooREST + 'tasks/create/url'
-$MaliciousArchiveREST = $CuckooREST + 'tasks/create/submit'
+#$MaliciousArchiveREST = $CuckooREST + 'tasks/create/submit'
  
 #Malzoo API Calls
 #curl -X POST -F file=@/path/to/sample -F tag=yourtaghere http://localhost:1338/file/add
@@ -38,7 +38,7 @@ $folderName = [Microsoft.VisualBasic.Interaction]::InputBox($msg, $title)
  
 #RegEx to Grab URL
 $RegExHtmlLinks = '<a\s+(?:[^>]*?\s+)?href="[h+f]([^"]*)"'
-$RegExHostName = '^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$'
+#$RegExHostName = '^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$'
  
 #Cuckoo Folder - #Feed the Cuckoo Subfolder
 $FeedTheCuckooUnread = $namespace.Folders.Item($emailAddress).Folders.Item($folderName).Items | Where-Object UnRead -EQ true
@@ -47,7 +47,7 @@ $FeedTheCuckooUnread = $namespace.Folders.Item($emailAddress).Folders.Item($fold
 function saveEmail{
     #The following command will save only the unread emails in the Inbox to the C:\Saved Emails\ folder
     $emailDestinationPath = 'C:\Saved Emails\Inbox'
-    $outbox = 'C:\Saved Emails\Outbox'
+    #$outbox = 'C:\Saved Emails\Outbox'
     .\Save-EmailCuckoo.ps1 -DestinationPath $emailDestinationPath -UnreadOnly #-MarkRead
     $emailMessage = Get-ChildItem $emailDestinationPath
     $emailPath = $emailDestinationPath+'\'+$emailMessage.Name
@@ -78,7 +78,7 @@ function findURLs {
             $urlsFound += $matches[0]
         }
     }
-    $urlsFound = $urlsFound | select-string -pattern $RegExHtmlLinks -AllMatches | Foreach {$_.Matches} | ForEach-Object {$_.Value} | Select-Object -Unique
+    $urlsFound = $urlsFound | select-string -pattern $RegExHtmlLinks -AllMatches | ForEach-Object {$_.Matches} | ForEach-Object {$_.Value} | Select-Object -Unique
  
     #Clean URLs for Analysis
     $cleanedUrlsForAnalysis = $urlsFound -replace '<a href='
@@ -133,7 +133,7 @@ function maliciousURLSubmission ($submitURL) {
     #Loop through all the URLs in the cleaned up array
     $submitURL | ForEach-Object {
         $submitURLx = $submitURL[$x]
-        #Invoke-RestMethod -Method Post -Uri $MaliciousURLREST -Body url=$submitURLx
+        Invoke-RestMethod -Method Post -Uri $MaliciousURLREST -Body url=$submitURLx
         [System.Windows.MessageBox]::Show($submitURLx)
         $x++
     }
