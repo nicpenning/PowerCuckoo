@@ -1,10 +1,23 @@
-<#PowerCuckoo
+<#
+.SYNOPSIS
+Send URLs from an Outlook Email folder that contains unread messages to Cuckoo.
+
+.DESCRIPTION
+    PowerCuckoo
     Created by Nicholas Penning
     Date: 8/14/2017
     Updated: 2/18/2019
-    Description: For automation!
 
-    Note: Works well for grabbing Unread messages from a folder of your choosing. Try it out!
+    This script is currently gui/manually driven but can be automated by statically setting some variables.
+    This initial release is for testing to get an understanding of how it works. 
+    The goal is to create a fully automated version that is liteweight and easy to use.
+
+.EXAMPLE
+./PowerCuckoo.ps1
+
+.NOTES
+Currently works well for grabbing Unread messages from a folder of your choosing and sending them to your Cuckoo host. 
+Try it out!
 #>
  
 #Cuckoo config
@@ -53,7 +66,6 @@ $form = New-Object System.Windows.Forms.Form
 $form.Text = 'Select a folder'
 $form.Size = New-Object System.Drawing.Size(300,200)
 $form.StartPosition = 'CenterScreen'
-
 $OKButton = New-Object System.Windows.Forms.Button
 $OKButton.Location = New-Object System.Drawing.Point(75,120)
 $OKButton.Size = New-Object System.Drawing.Size(75,23)
@@ -117,7 +129,7 @@ Write-Host -ForegroundColor Green "Found $unreadCount Unread Items to parse"
     #Submit for Analysis
     maliciousFileSubmission($emailPath)
 }#>
- 
+
 #Parse Email for URLs
 function findURLs {
     $EmailBodyToSearch = @()
