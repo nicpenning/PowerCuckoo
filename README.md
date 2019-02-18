@@ -17,7 +17,7 @@ Setup
 What works:
  - Tested on Windows 10 with Office 365 (Version 1901)
  - Reading a specific email folder to look for URLs or Attachments and submits them!
- - Warning: Becareful using the built-in Junk Email folder, for it may distort URLs/Attachments for anlaysis!
+ - Warning: Becareful using the built-in Junk Email folder, for it may distort URLs/Attachments for analysis!
 
 Usage:
  - ./PowerCuckoo.ps1
