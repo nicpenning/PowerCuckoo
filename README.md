@@ -1,5 +1,5 @@
 # PowerCuckoo
-Using PowerShell to interact with Cuckoo
+Using PowerShell on Windows with Outlook to interact with Cuckoo
 
 What's this?
 - Customizable script that reads Outlook email using the Outlook ComObject to read, parse, and send emails to Cuckoo for analysis
