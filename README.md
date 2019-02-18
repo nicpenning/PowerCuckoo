@@ -6,9 +6,10 @@ Usage: Customizable script that reads Outlook email using the Outlook ComObject 
 Much more to come!
 
 Requirements:
-
+ - Windows 7+
+ - Outlook 2010+
+ - PowerShell
  - SaveEmailCuckoo.ps1
-
  - curl.exe
 
 Setup
@@ -19,3 +20,13 @@ Note: Not fully functioning.
 
 What works:
  - Reading a specific email folder to look for URLs or Attachments
+
+Usage:
+ - ./PowerCuckoo.ps1
+ 
+ TODO:
+  - Update this README
+  - Add screenshots of POC
+  - Remove Curl.exe requirement
+  - Remove SaveEmailCuckoo.ps1 requirement
+  - Add Auto-setup/install
