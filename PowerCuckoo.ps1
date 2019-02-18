@@ -20,7 +20,7 @@ Currently works well for grabbing Unread messages from a folder of your choosing
 Try it out!
 #>
 #Some things to load first - Pay no attention here
-[System.Reflection.Assembly]::LoadWithPartialName("Microsoft.VisualBasic") | Out-Null
+[void][Reflection.Assembly]::LoadWithPartialName('Microsoft.VisualBasic')
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 Add-Type -AssemblyName PresentationFramework
@@ -50,7 +50,6 @@ Add-Type -Assembly "Microsoft.Office.Interop.Outlook"
 $Outlook = New-Object -ComObject Outlook.Application
 $namespace = $Outlook.GetNameSpace("MAPI")
 #Ask for Email Address for Outlook
-[void][Reflection.Assembly]::LoadWithPartialName('Microsoft.VisualBasic')
 $title = 'Email Address Configuration'
 $msg = "Enter your Outlook Email Address`n`nTip: Make sure Outlook is Running!"
 $emailAddress = [Microsoft.VisualBasic.Interaction]::InputBox($msg, $title)
