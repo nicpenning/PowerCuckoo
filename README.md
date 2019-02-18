@@ -22,9 +22,10 @@ What works:
 
 Usage:
  - ./PowerCuckoo.ps1
+ - Check out the Wiki!
+ https://github.com/nicpenning/PowerCuckoo/wiki
  
  TODO:
-  - Add screenshots of POC
   - Add Auto-setup/install
   - Create Automated version
   - Create EWS version
