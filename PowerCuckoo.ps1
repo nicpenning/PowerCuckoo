@@ -19,7 +19,11 @@ Send URLs from an Outlook Email folder that contains unread messages to Cuckoo.
 Currently works well for grabbing Unread messages from a folder of your choosing and sending them to your Cuckoo host. 
 Try it out!
 #>
- 
+#Some things to load first - Pay no attention here
+[System.Reflection.Assembly]::LoadWithPartialName("Microsoft.VisualBasic") | Out-Null
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName PresentationFramework
 #Cuckoo config
 #127.0.0.1:8090 is default, to change use: cuckoo api --host 127.0.0.1 -p 80
 try {
@@ -57,10 +61,6 @@ $foldersAvailable = $namespace.Folders.Item($emailAddress).Folders | Select-Obje
 $msg = "Enter your Outlook Email Folder you wish to parse: $foldersAvailable"
 #Manually ask for folder input - also can be used to statically select folder name
 #$folderName = [Microsoft.VisualBasic.Interaction]::InputBox($msg, $title)
-
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
-Add-Type -AssemblyName PresentationFramework
 
 $form = New-Object System.Windows.Forms.Form
 $form.Text = 'Select a folder'
