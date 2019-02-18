@@ -8,7 +8,7 @@ Much more to come!
 
 Requirements:
  - Windows 7+
- - Outlook 2010+
+ - Outlook 2010 (Running)+
  - PowerShell
  - Cuckoo 2.0+
 
