@@ -231,7 +231,7 @@ $FeedTheCuckooUnread | ForEach-Object {
     $_.Unread = "False"
 }
 if ($attachmentCount -ge 1) {
-    Write-Host "Attachments Found: $attachmentCount (Not currently supported to send for analysis)"
+    Write-Host "Attachments Found: $attachmentCount"
     maliciousFileSubmission
     Write-Host "Onto looking for URLs"
     findURLs

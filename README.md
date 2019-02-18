@@ -8,24 +8,23 @@ Much more to come!
 
 Requirements:
  - Windows 7+
- - Outlook 2010 (Running)+
+ - Outlook 2010+ (Running)
  - PowerShell
- - Cuckoo 2.0+
+ - Cuckoo 2.0+ (API running)
 
 Setup
  - Download PowerCuckoo.ps1
  - Run ./PowerCuckoo.ps1
 
-Note: Should work! Try it out!
-
 What works:
- - Reading a specific email folder to look for URLs or Attachments
+ - Tested on Windows 10 with Office 365 (Version 1901)
+ - Reading a specific email folder to look for URLs or Attachments and submits them!
 
 Usage:
  - ./PowerCuckoo.ps1
  
  TODO:
-  - Update this README
   - Add screenshots of POC
-  - Submit Files
   - Add Auto-setup/install
+  - Create Automated version
+  - Create EWS version
