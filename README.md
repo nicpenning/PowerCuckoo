@@ -18,6 +18,7 @@ Requirements:
 
 Setup
  - Download PowerCuckoo.ps1
+ - Open Outlook
  - Run ./PowerCuckoo.ps1
 
 What works:
