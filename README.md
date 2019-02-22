@@ -1,6 +1,9 @@
 
-![](https://github.com/nicpenning/PowerCuckoo/blob/master/images/PowerCuckooLogo.png)
+<p align="center">
+  <img src="https://github.com/nicpenning/PowerCuckoo/blob/master/images/PowerCuckooLogo.png">
+</p>
 
+***
 # PowerCuckoo
 Using PowerShell on Windows with Outlook to interact with Cuckoo
 
