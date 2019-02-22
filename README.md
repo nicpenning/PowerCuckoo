@@ -1,3 +1,6 @@
+
+![](https://github.com/nicpenning/PowerCuckoo/blob/master/images/PowerCuckooLogo.png)
+
 # PowerCuckoo
 Using PowerShell on Windows with Outlook to interact with Cuckoo
 
