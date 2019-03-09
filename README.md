@@ -1,10 +1,14 @@
+
+<p align="center">
+  <img src="https://github.com/nicpenning/PowerCuckoo/blob/master/images/PowerCuckooLogo.png">
+</p>
+
+***
 # PowerCuckoo
 Using PowerShell on Windows with Outlook to interact with Cuckoo
 
 What's this?
-- Customizable script that reads Outlook email using the Outlook ComObject to read, parse, and send emails to Cuckoo for analysis
-
-Much more to come!
+- Customizable script that reads Outlook email using the Outlook ComObject to read, parse, and send emails to Cuckoo for analysis.
 
 Requirements:
  - Windows 7+
@@ -14,11 +18,13 @@ Requirements:
 
 Setup
  - Download PowerCuckoo.ps1
+ - Open Outlook
  - Run ./PowerCuckoo.ps1
 
 What works:
  - Tested on Windows 10 with Office 365 (Version 1901)
  - Reading a specific email folder to look for URLs or Attachments and submits them!
+ - Warning: Becareful using the built-in Junk Email folder, for it may distort URLs/Attachments for analysis!
 
 Usage:
  - ./PowerCuckoo.ps1
