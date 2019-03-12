@@ -5,23 +5,32 @@ Send URLs from an Outlook Email folder that contains unread messages to Cuckoo.
 .DESCRIPTION
     PowerCuckoo
     Date: 8/14/2017
-    Updated: 3/9/2019
+    Updated: 3/11/2019
 
     This script is currently gui/manually driven but can be automated by statically setting some variables.
     This release adds some automation to send artifacts to Cuckoo alongside the testing version to get an understanding of how it works. 
     The goal is to create a fully automated version that is liteweight and easy to use.
 
 .EXAMPLE
-Running the raw script will run the manual or automated version of the script depending on your answer.
 ./PowerCuckoo.ps1
+Running the raw script will run the manual or automated version of the script depending on your answer.
 
-This will allow the script to run the manual version, prompting for your configuration settings and walk you through the process of submitting files.
-This is good for testing!
 ./PowerCuckoo.ps1 -automated false
+The will allow the script to run the manual version, prompting for your configuration settings and walk you through the process of submitting files.
+This is good for testing!
 
+./PowerCuckoo.ps1 -automated true
 This will allow the script to run the automated version checking for the configuration in this script below.
 If the settings are null or misconfigured it will alert you as such.
+
 ./PowerCuckoo.ps1 -automated true
+This will allow the script to run the automated version checking for the configuration in this script below.
+If the settings are null or misconfigured it will alert you as such.
+
+./PowerCuckoo.ps1 -automated true -duration 10
+This will allow the script to run forever and will check for the specified amount of seconds before the scripts stops. 
+Lower the seconds the more work the script has to do to continue to check for an unread item.
+Note: This will check for unread messages every minute.
 
 .NOTES
 Currently works well for grabbing Unread messages from a folder of your choosing and sending them to your Cuckoo host. 
@@ -42,7 +51,12 @@ Param
     [Parameter(Mandatory=$false,
                 ValueFromPipelineByPropertyName=$true,
                 Position=0)]
-    $automated
+    $automated,
+    # Seconds to execute
+    [Parameter(Mandatory=$false,
+                ValueFromPipelineByPropertyName=$true,
+                Position=1)]
+    $duration
 )
 
 #Enter static configuration settings here for the automated version of this script!
@@ -164,6 +178,8 @@ $MaliciousURLREST = $CuckooREST + 'tasks/create/url'
 $folderName = $folderChosen
 #RegEx to Grab URL
 $RegExSpecial = '((http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-;]*[\w@?^=%&/~+#-;])?)'
+if($duration -eq $null){$runOnce = $true}
+do{
 #Cuckoo Folder - #Feed the Cuckoo Subfolder
 $FeedTheCuckooUnread = $namespace.Folders.Item($emailAddress).Folders.Item($folderName).Items | Where-Object UnRead -EQ true
 $unreadCount = $FeedTheCuckooUnread.Count
@@ -311,5 +327,7 @@ if ($attachmentCount -ge 1) {
         [System.Windows.MessageBox]::Show('Something went terribly wrong')
     }else{Write-Host "Something went terribly wrong"}
 }
-
+Start-Sleep $duration
+$runOnce = $false
+}while($duration -ge 0 -or $runOnce -eq $true)
 Read-host "PowerCuckoo has finished running! Hit Enter to exit."
