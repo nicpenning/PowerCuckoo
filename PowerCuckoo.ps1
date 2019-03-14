@@ -327,7 +327,7 @@ if ($attachmentCount -ge 1) {
         [System.Windows.MessageBox]::Show('Something went terribly wrong')
     }else{Write-Host "Something went terribly wrong"}
 }
-Start-Sleep $duration
+Start-Sleep -Seconds $duration
 $runOnce = $false
 }while($duration -ge 0 -or $runOnce -eq $true)
 Read-host "PowerCuckoo has finished running! Hit Enter to exit."
