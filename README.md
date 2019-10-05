@@ -32,6 +32,8 @@ Usage:
  https://github.com/nicpenning/PowerCuckoo/wiki
  
  TODO:
-  - Add Auto-setup/install
-  - Create Automated version
+  - Add Auto-Setup/Install
   - Create EWS version
+  - Support Cuckoo 2.0.7 (Add API Authentication)
+  - Add SSL/TLS Support
+  - Add Alerting/Reporting
