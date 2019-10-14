@@ -70,7 +70,7 @@ function staticConf {
     if($CuckooIPandPort -eq "" -or $emailAddress -eq "" -or $folderChosen -eq ""){
         return $null
     }else{
-        return $CuckooIPandPort, $emailAddress, $folderChosen
+        return $CuckooIPandPort, $emailAddress, $folderChosen, $apiKey
     }
 }
 switch ($automated) {
@@ -278,7 +278,7 @@ function maliciousFileSubmission ($submitFile) {
             ) -join $LF
             $task = ''
             #Send the encoded blob to Cuckoo!
-            $task = Invoke-RestMethod -Uri $MaliciousFileREST -Method Post -ContentType "multipart/form-data; boundary=`"$boundary`"" -Body $bodyLines -Headers $apiKey
+            $task = Invoke-RestMethod -Uri $MaliciousFileREST -Method Post -ContentType "multipart/form-data; boundary=`"$boundary`"" -Body $bodyLines -Headers $headers
             if($automated -eq $false){[System.Windows.MessageBox]::Show('Running Malicious File Submission')}
 
             #If task submits successfully, delete the temporary created file.
@@ -304,7 +304,7 @@ function maliciousURLSubmission ($submitURL) {
     #Loop through all the URLs
     $submitURL | ForEach-Object {
         $submitURLx = $_
-        $task = Invoke-RestMethod -Method Post -Uri $MaliciousURLREST -Body url=$submitURLx
+        $task = Invoke-RestMethod -Method Post -Uri $MaliciousURLREST -Body url=$submitURLx -Headers $headers
         $taskID = $task.task_id
         Write-Host "Task ID: $taskID `nURL Submitted: $submitURLx"
     }
