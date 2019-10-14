@@ -175,7 +175,6 @@ switch ($automated){
             checkCuckoo $CuckooIPandPort
         }
     }
-
 }
 
 #Cuckoo REST API
