@@ -5,7 +5,7 @@ Send URLs from an Outlook Email folder that contains unread messages to Cuckoo.
 .DESCRIPTION
     PowerCuckoo
     Date: 8/14/2017
-    Updated: 10/13/2019
+    Updated: 10/14/2019
 
     This script is currently gui/manually driven but can be automated by statically setting some variables.
     This release adds some automation to send artifacts to Cuckoo alongside the testing version to get an understanding of how it works. 
@@ -32,7 +32,7 @@ Note: This will check for unread messages every minute.
 Currently works well for grabbing Unread messages from a folder of your choosing and sending them to your Cuckoo host. 
 Try it out!
 
-Lines 49 51 53 are used for statically configuring this script for automation.
+Lines 63 65 67 69 are used for statically configuring this script for automation.
 Those variables are these if you need to find them:
     $CuckooIPandPort = ""
     $emailAddress = ""
