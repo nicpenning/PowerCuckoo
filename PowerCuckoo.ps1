@@ -164,7 +164,7 @@ switch ($automated){
     }
     ($true){
         $staticVars = staticConf
-        if($staticVars -eq $null){Write-Host "No static config found in PowerCuckoo.ps1 file. Adjust those variables. Going to exit."; pause; exit;
+        if($null -eq $staticVars){Write-Host "No static config found in PowerCuckoo.ps1 file. Adjust those variables. Going to exit."; pause; exit;
         }else{
             $staticVars = staticConf
             $CuckooIPandPort = $staticVars[0]
@@ -186,7 +186,7 @@ $MaliciousURLREST = $CuckooREST + 'tasks/create/url'
 $folderName = $folderChosen
 #RegEx to Grab URL
 $RegExSpecial = '((http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-;]*[\w@?^=%&/~+#-;])?)'
-if($duration -eq $null){$runOnce = $true}
+if($null -eq $duration){$runOnce = $true}
 do{
 #Cuckoo Folder - #Feed the Cuckoo Subfolder
 $FeedTheCuckooUnread = $namespace.Folders.Item($emailAddress).Folders.Item($folderName).Items | Where-Object UnRead -EQ true
