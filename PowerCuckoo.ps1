@@ -104,7 +104,7 @@ function checkCuckoo($CuckooIPandPort){
     catch {
         Write-Host -BackgroundColor Red "Could not get Cuckoo status...abandoning.."
         $errors = $_ | ConvertFrom-Json
-        if($errors.message -contains ''Authorization: Bearer ' header is required'){Write-host "API Key is incorrect or not found! Double check your cuckoo.conf for the API key and verify it is the same key you entered for PowerCuckoo to use in the static configuration."}
+        if($errors.message -contains "'Authorization: Bearer ' header is required"){Write-host "API Key is incorrect or not found! Double check your cuckoo.conf for the API key and verify it is the same key you entered for PowerCuckoo to use in the static configuration."}
         Exit
     }
 }
