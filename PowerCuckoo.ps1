@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-Send URLs from an Outlook Email folder that contains unread messages to Cuckoo.
+Send URLs and Files from an Outlook Email folder that contains unread messages to Cuckoo.
 
 .DESCRIPTION
     PowerCuckoo
