@@ -1,11 +1,11 @@
 <#
 .SYNOPSIS
-Send URLs from an Outlook Email folder that contains unread messages to Cuckoo.
+Send URLs and Files from an Outlook Email folder that contains unread messages to Cuckoo.
 
 .DESCRIPTION
     PowerCuckoo
     Date: 8/14/2017
-    Updated: 3/11/2019
+    Updated: 10/14/2019
 
     This script is currently gui/manually driven but can be automated by statically setting some variables.
     This release adds some automation to send artifacts to Cuckoo alongside the testing version to get an understanding of how it works. 
@@ -23,10 +23,6 @@ This is good for testing!
 This will allow the script to run the automated version checking for the configuration in this script below.
 If the settings are null or misconfigured it will alert you as such.
 
-./PowerCuckoo.ps1 -automated true
-This will allow the script to run the automated version checking for the configuration in this script below.
-If the settings are null or misconfigured it will alert you as such.
-
 ./PowerCuckoo.ps1 -automated true -duration 10
 This will allow the script to run forever and will check for the specified amount of seconds before the scripts stops. 
 Lower the seconds the more work the script has to do to continue to check for an unread item.
@@ -36,11 +32,12 @@ Note: This will check for unread messages every minute.
 Currently works well for grabbing Unread messages from a folder of your choosing and sending them to your Cuckoo host. 
 Try it out!
 
-Lines 49 51 53 are used for statically configuring this script for automation.
+Lines 63 65 67 69 are used for statically configuring this script for automation.
 Those variables are these if you need to find them:
     $CuckooIPandPort = ""
     $emailAddress = ""
     $folderChosen = ""
+    $apikey = ""
 #>
 
 [CmdletBinding()]
@@ -68,17 +65,19 @@ function staticConf {
     $emailAddress = ""
     #Folder name in your inbox example: "Cuckoo"
     $folderChosen = ""
+    #API Key configured in your cuckoo.conf file for authentication, highly recommended that you use this if you are running Cuckoo 2.0.7+!
+    $apiKey = ""
     if($CuckooIPandPort -eq "" -or $emailAddress -eq "" -or $folderChosen -eq ""){
         return $null
     }else{
-        return $CuckooIPandPort, $emailAddress, $folderChosen
+        return $CuckooIPandPort, $emailAddress, $folderChosen, $apiKey
     }
 }
 switch ($automated) {
     $true {Write-Host "You have set automate to $automated! Good choice!"; $automated = $true}
     $false {Write-Host "You have set automate to $automated! Good choice!"; $automated = $false}
     $null {
-        $automated= Read-Host -Prompt 'Automated version? (Enter true or false)'
+        $automated = Read-Host -Prompt 'Automated version? (Enter true or false)'
         Write-Host "Option $automated"
         if($automated -ne $true -and $automated -ne $false){
             Write-Host "Not a valid option, please enter true or false. Exiting";Pause;exit
@@ -94,11 +93,18 @@ $namespace = $Outlook.GetNameSpace("MAPI")
 
 function checkCuckoo($CuckooIPandPort){
     try {
-        $cuckooStatus = Invoke-RestMethod $CuckooIPandPort"/cuckoo/status"
+        if($apiKey){
+            $headers = @{Authorization = "Bearer $apiKey"}
+        }else{
+            $headers = $null
+        }
+        $cuckooStatus = Invoke-RestMethod $CuckooIPandPort"/cuckoo/status" -Headers $headers
         Write-Host -ForegroundColor Green $cuckooStatus.hostname'(Version:'$cuckooStatus.version') loaded!'
     }
     catch {
         Write-Host -BackgroundColor Red "Could not get Cuckoo status...abandoning.."
+        $errors = $_ | ConvertFrom-Json
+        if($errors.message -contains "Authentication in the form of an 'Authorization: Bearer ' header is required"){Write-host -ForegroundColor Red "API Key is incorrect or not found! Double check your cuckoo.conf for the API key and verify it is the same key you entered for PowerCuckoo to use in the static configuration."}
         Exit
     }
 }
@@ -110,6 +116,8 @@ switch ($automated){
         #Cuckoo Config# 127.0.0.1:8090 is default, to change use: cuckoo api --host 127.0.0.1 -p 80
 
         $CuckooIPandPort = [Microsoft.VisualBasic.Interaction]::InputBox("Set your Cuckoo Host and Port`n`n`nFor Example: http://127.0.0.1:8090", "Where is your Cuckoo nesting?")
+        $apiKey = [Microsoft.VisualBasic.Interaction]::InputBox("What is your API Key if you are using one?`n`n`nFor Example: 1BXU9tfuBgsY5R0KxrmDIg", "What is your Cuckoo's api key?")
+
         #Check to see if Cuckoo is configured and working appropriately
         checkCuckoo $CuckooIPandPort
 
@@ -156,17 +164,17 @@ switch ($automated){
     }
     ($true){
         $staticVars = staticConf
-        if($staticVars -eq $null){Write-Host "No static config found in PowerCuckoo.ps1 file. Adjust those variables. Going to exit."; pause; exit;
+        if($null -eq $staticVars){Write-Host "No static config found in PowerCuckoo.ps1 file. Adjust those variables. Going to exit."; pause; exit;
         }else{
             $staticVars = staticConf
             $CuckooIPandPort = $staticVars[0]
             $emailAddress = $staticVars[1]
             $folderChosen = $staticVars[2]
+            $apiKey = $staticVars[3]
             $staticVars
             checkCuckoo $CuckooIPandPort
         }
     }
-
 }
 
 #Cuckoo REST API
@@ -178,7 +186,7 @@ $MaliciousURLREST = $CuckooREST + 'tasks/create/url'
 $folderName = $folderChosen
 #RegEx to Grab URL
 $RegExSpecial = '((http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-;]*[\w@?^=%&/~+#-;])?)'
-if($duration -eq $null){$runOnce = $true}
+if($null -eq $duration){$runOnce = $true}
 do{
 #Cuckoo Folder - #Feed the Cuckoo Subfolder
 $FeedTheCuckooUnread = $namespace.Folders.Item($emailAddress).Folders.Item($folderName).Items | Where-Object UnRead -EQ true
@@ -269,7 +277,7 @@ function maliciousFileSubmission ($submitFile) {
             ) -join $LF
             $task = ''
             #Send the encoded blob to Cuckoo!
-            $task = Invoke-RestMethod -Uri $MaliciousFileREST -Method Post -ContentType "multipart/form-data; boundary=`"$boundary`"" -Body $bodyLines
+            $task = Invoke-RestMethod -Uri $MaliciousFileREST -Method Post -ContentType "multipart/form-data; boundary=`"$boundary`"" -Body $bodyLines -Headers $headers
             if($automated -eq $false){[System.Windows.MessageBox]::Show('Running Malicious File Submission')}
 
             #If task submits successfully, delete the temporary created file.
@@ -295,7 +303,7 @@ function maliciousURLSubmission ($submitURL) {
     #Loop through all the URLs
     $submitURL | ForEach-Object {
         $submitURLx = $_
-        $task = Invoke-RestMethod -Method Post -Uri $MaliciousURLREST -Body url=$submitURLx
+        $task = Invoke-RestMethod -Method Post -Uri $MaliciousURLREST -Body url=$submitURLx -Headers $headers
         $taskID = $task.task_id
         Write-Host "Task ID: $taskID `nURL Submitted: $submitURLx"
     }
