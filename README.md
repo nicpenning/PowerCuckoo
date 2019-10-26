@@ -31,8 +31,11 @@ Usage:
  - Check out the Wiki!
  https://github.com/nicpenning/PowerCuckoo/wiki
  
- TODO:
+TODO:
   - Add Auto-Setup/Install
   - Create EWS version
   - Add SSL/TLS Support
   - Add Alerting/Reporting
+
+If you would like to join our Teams channel please send a request to this address:
+7d98f163.Yamsec401.onmicrosoft.com@amer.teams.ms
