@@ -34,6 +34,5 @@ Usage:
  TODO:
   - Add Auto-Setup/Install
   - Create EWS version
-  - Support Cuckoo 2.0.7 (Add API Authentication)
   - Add SSL/TLS Support
   - Add Alerting/Reporting
