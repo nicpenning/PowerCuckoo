@@ -94,11 +94,11 @@ $namespace = $Outlook.GetNameSpace("MAPI")
 function checkCuckoo($CuckooIPandPort){
     try {
         if($apiKey){
-            $headers = @{Authorization = "Bearer $apiKey"}
+            $global:headers = @{Authorization = "Bearer $apiKey"}
         }else{
             $headers = $null
         }
-        $cuckooStatus = Invoke-RestMethod $CuckooIPandPort"/cuckoo/status" -Headers $headers
+        $cuckooStatus = Invoke-RestMethod $CuckooIPandPort"/cuckoo/status" -Headers $global:headers
         Write-Host -ForegroundColor Green $cuckooStatus.hostname'(Version:'$cuckooStatus.version') loaded!'
     }
     catch {
@@ -277,7 +277,7 @@ function maliciousFileSubmission ($submitFile) {
             ) -join $LF
             $task = ''
             #Send the encoded blob to Cuckoo!
-            $task = Invoke-RestMethod -Uri $MaliciousFileREST -Method Post -ContentType "multipart/form-data; boundary=`"$boundary`"" -Body $bodyLines -Headers $headers
+            $task = Invoke-RestMethod -Uri $MaliciousFileREST -Method Post -ContentType "multipart/form-data; boundary=`"$boundary`"" -Body $bodyLines -Headers $global:headers
             if($automated -eq $false){[System.Windows.MessageBox]::Show('Running Malicious File Submission')}
 
             #If task submits successfully, delete the temporary created file.
@@ -303,7 +303,7 @@ function maliciousURLSubmission ($submitURL) {
     #Loop through all the URLs
     $submitURL | ForEach-Object {
         $submitURLx = $_
-        $task = Invoke-RestMethod -Method Post -Uri $MaliciousURLREST -Body url=$submitURLx -Headers $headers
+        $task = Invoke-RestMethod -Method Post -Uri $MaliciousURLREST -Body url=$submitURLx -Headers $global:headers
         $taskID = $task.task_id
         Write-Host "Task ID: $taskID `nURL Submitted: $submitURLx"
     }
